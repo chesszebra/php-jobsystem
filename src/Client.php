@@ -245,7 +245,7 @@ final class Client
         ));
 
         if (!$this->workers->has($job->getWorkerName())) {
-           throw new UnknownWorkerException(sprintf('The worker "%s" is not a valid worker.', $job->getWorkerName()));
+            throw new UnknownWorkerException(sprintf('The worker "%s" is not a valid worker.', $job->getWorkerName()));
         }
 
         /** @var WorkerInterface $worker */
