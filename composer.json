@@ -2,6 +2,7 @@
     "name": "chesszebra/jobsystem",
     "description": "A PHP library providing a job system used to run background jobs.",
     "license": "MIT",
+    "type": "library",
     "require": {
         "psr/container": "^1.0",
         "psr/log": "^1.0"
