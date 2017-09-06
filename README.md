@@ -7,7 +7,7 @@ A PHP library that provides support for executing worker jobs.
 ## Installation
 
 ```bash
-composer require chesszebra/php-jobsystem
+composer require chesszebra/jobsystem
 ```
 
 ## Usage
