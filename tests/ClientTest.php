@@ -37,6 +37,24 @@ final class ClientTest extends TestCase
     }
 
     /**
+     * Tests if the storage is constructed.
+     *
+     * @covers \ChessZebra\JobSystem\Client::__construct
+     * @covers \ChessZebra\JobSystem\Client::getStorage
+     */
+    public function testIfStorageIsConstructed()
+    {
+        // Arrange
+        $client = new Client($this->storage, $this->logger, $this->workers);
+
+        // Act
+        $result = $client->getStorage();
+
+        // Assert
+        static::assertInstanceOf(StorageInterface::class, $result);
+    }
+
+    /**
      * Tests if the lifetime is constructed.
      *
      * @covers \ChessZebra\JobSystem\Client::__construct

@@ -91,6 +91,16 @@ final class Client
     }
 
     /**
+     * Gets the storage used by this client.
+     *
+     * @return StorageInterface
+     */
+    public function getStorage(): StorageInterface
+    {
+        return $this->storage;
+    }
+
+    /**
      * Gets the lifetime of the client.
      *
      * @return int Returns the lifetime in seconds.

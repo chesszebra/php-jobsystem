@@ -14,6 +14,7 @@ use ChessZebra\JobSystem\Job\JobInterface;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\PheanstalkInterface;
+use RuntimeException;
 
 final class StoredJob implements StoredJobInterface
 {
@@ -67,6 +68,27 @@ final class StoredJob implements StoredJobInterface
     public function createJobRepresentation(): JobInterface
     {
         $json = json_decode($this->job->getData(), true);
+
+        if (!$json) {
+            throw new RuntimeException(sprintf(
+                'Invalid JSON, got "%s"',
+                $this->job->getData()
+            ));
+        }
+
+        if (!array_key_exists('type', $json)) {
+            throw new RuntimeException(sprintf(
+                'Missing "type" field in "%s"',
+                $this->job->getData()
+            ));
+        }
+
+        if (!array_key_exists('data', $json)) {
+            throw new RuntimeException(sprintf(
+                'Missing "data" field in "%s"',
+                $this->job->getData()
+            ));
+        }
 
         $job = new Job($json['type'], $json['data'], $this->stats['tube']);
         $job->setDelay((int)$this->stats['delay']);
