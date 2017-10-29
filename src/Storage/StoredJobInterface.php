@@ -29,4 +29,11 @@ interface StoredJobInterface
      * @return JobInterface
      */
     public function createJobRepresentation(): JobInterface;
+
+    /**
+     * Gets a key value list with statistics about the job.
+     *
+     * @return array
+     */
+    public function getStats(): array;
 }

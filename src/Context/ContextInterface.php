@@ -47,4 +47,18 @@ interface ContextInterface
      * @return mixed
      */
     public function getParam(string $name, $defaultValue = null);
+
+    /**
+     * Gets all the parameters.
+     *
+     * @return array
+     */
+    public function getParams(): array;
+
+    /**
+     * Gets the statistics of the current executed job.
+     *
+     * @return array
+     */
+    public function getStats(): array;
 }

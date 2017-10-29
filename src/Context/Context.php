@@ -46,6 +46,13 @@ final class Context implements ContextInterface
     private $params;
 
     /**
+     * Statistics of the executed job.
+     *
+     * @var array
+     */
+    private $stats;
+
+    /**
      * Initializes a new instance of this class.
      *
      * @param StorageInterface $storage The job storage.
@@ -58,6 +65,7 @@ final class Context implements ContextInterface
         $this->logger = $logger;
         $this->storedJob = $storedJob;
         $this->params = $storedJob->createJobRepresentation()->getWorkerParams();
+        $this->stats = $storedJob->getStats();
     }
 
     /**
@@ -105,5 +113,25 @@ final class Context implements ContextInterface
         }
 
         return $defaultValue;
+    }
+
+    /**
+     * Gets all the parameters.
+     *
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * Gets the statistics of the current executed job.
+     *
+     * @return array
+     */
+    public function getStats(): array
+    {
+        return $this->stats;
     }
 }

@@ -137,4 +137,40 @@ final class ContextTest extends TestCase
         // Assert
         static::assertEquals('default', $result);
     }
+
+    /**
+     * Tests if getParams returns a valid value.
+     *
+     * @covers \ChessZebra\JobSystem\Context\Context::__construct
+     * @covers \ChessZebra\JobSystem\Context\Context::getParams
+     */
+    public function testGetParams()
+    {
+        // Arrange
+        $context = new Context($this->storage, $this->logger, $this->storedJob);
+
+        // Act
+        $result = $context->getParams();
+
+        // Assert
+        static::assertEquals([], $result);
+    }
+
+    /**
+     * Tests if getStats returns a valid value.
+     *
+     * @covers \ChessZebra\JobSystem\Context\Context::__construct
+     * @covers \ChessZebra\JobSystem\Context\Context::getStats
+     */
+    public function testGetStats()
+    {
+        // Arrange
+        $context = new Context($this->storage, $this->logger, $this->storedJob);
+
+        // Act
+        $result = $context->getStats();
+
+        // Assert
+        static::assertEquals([], $result);
+    }
 }

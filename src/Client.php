@@ -17,6 +17,7 @@ use ChessZebra\JobSystem\Worker\Exception\RecoverableException;
 use ChessZebra\JobSystem\Worker\Exception\UnknownWorkerException;
 use ChessZebra\JobSystem\Worker\RescheduleStrategy\RescheduleStrategyInterface;
 use ChessZebra\JobSystem\Worker\WorkerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -87,7 +88,6 @@ final class Client
         $this->interval = 500;
         $this->lifetime = 3600;
         $this->maximumMemoryUsage = PHP_INT_MAX;
-        $this->rescheduleStrategy = null;
     }
 
     /**
@@ -114,8 +114,9 @@ final class Client
      * Sets the lifetime (in seconds) for the client.
      *
      * @param int $lifetime The lifetime to set.
+     * @return void
      */
-    public function setLifetime(int $lifetime)
+    public function setLifetime(int $lifetime): void
     {
         $this->lifetime = $lifetime;
     }
@@ -134,8 +135,9 @@ final class Client
      * Sets the maximum amount of memory that can be used by the client.
      *
      * @param int $maximumMemoryUsage The memory in bytes to set.
+     * @return void
      */
-    public function setMaximumMemoryUsage(int $maximumMemoryUsage)
+    public function setMaximumMemoryUsage(int $maximumMemoryUsage): void
     {
         $this->maximumMemoryUsage = $maximumMemoryUsage;
     }
@@ -154,8 +156,9 @@ final class Client
      * Sets the interval in between jobs.
      *
      * @param int $interval The interval in seconds to set.
+     * @return void
      */
-    public function setInterval(int $interval)
+    public function setInterval(int $interval): void
     {
         $this->interval = $interval;
     }
@@ -174,8 +177,9 @@ final class Client
      * Sets the reschedule strategy.
      *
      * @param null|RescheduleStrategyInterface $rescheduleStrategy The strategy to set.
+     * @return void
      */
-    public function setRescheduleStrategy(?RescheduleStrategyInterface $rescheduleStrategy)
+    public function setRescheduleStrategy(?RescheduleStrategyInterface $rescheduleStrategy): void
     {
         $this->rescheduleStrategy = $rescheduleStrategy;
     }
@@ -209,7 +213,14 @@ final class Client
         return $exitCode;
     }
 
-    private function shouldKeepRunning(int $startTime, int $memoryUsage)
+    /**
+     * Checks if the client should keep running.
+     *
+     * @param int $startTime The unixtime of when the client started running.
+     * @param int $memoryUsage The current amount of memory usage.
+     * @return bool
+     */
+    private function shouldKeepRunning(int $startTime, int $memoryUsage): bool
     {
         $runningTimeExpired = (time() - $startTime) >= $this->getLifetime();
 
@@ -218,7 +229,10 @@ final class Client
         return !$runningTimeExpired && !$memoryLimitReached;
     }
 
-    private function processNextJob()
+    /**
+     * @return void
+     */
+    private function processNextJob(): void
     {
         /** @var StoredJobInterface|null $job */
         $job = $this->storage->retrieveJob();
@@ -231,7 +245,10 @@ final class Client
         $this->processJob($job);
     }
 
-    private function processJob(StoredJobInterface $storedJob)
+    /**
+     * @param StoredJobInterface $storedJob
+     */
+    private function processJob(StoredJobInterface $storedJob): void
     {
         try {
             $this->executeJob($storedJob);
@@ -242,7 +259,12 @@ final class Client
         }
     }
 
-    private function executeJob(StoredJobInterface $storedJob)
+    /**
+     * @param StoredJobInterface $storedJob
+     * @throws UnknownWorkerException Thrown when the worker type is unknown.
+     * @throws ContainerExceptionInterface Thrown when the worker cannot be retrieved from the service container.
+     */
+    private function executeJob(StoredJobInterface $storedJob): void
     {
         /** @var JobInterface $job */
         $job = $storedJob->createJobRepresentation();
@@ -270,7 +292,11 @@ final class Client
         ));
     }
 
-    private function rescheduleJob(StoredJobInterface $storedJob, Throwable $throwable)
+    /**
+     * @param StoredJobInterface $storedJob
+     * @param Throwable $throwable
+     */
+    private function rescheduleJob(StoredJobInterface $storedJob, Throwable $throwable): void
     {
         $this->logger->emergency(sprintf(
             '[#%d] Rescheduling job: %s',
@@ -286,7 +312,11 @@ final class Client
         $this->storage->rescheduleJob($storedJob, $delay, $priority);
     }
 
-    private function failJob(StoredJobInterface $storedJob, Throwable $throwable)
+    /**
+     * @param StoredJobInterface $storedJob
+     * @param Throwable $throwable
+     */
+    private function failJob(StoredJobInterface $storedJob, Throwable $throwable): void
     {
         $this->logger->emergency(sprintf(
             '[#%d] Job failed: %s',

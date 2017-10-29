@@ -64,6 +64,7 @@ final class StoredJob implements StoredJobInterface
      * Creates the original job representation.
      *
      * @return JobInterface
+     * @throws RuntimeException Thrown when invalid job data was provided.
      */
     public function createJobRepresentation(): JobInterface
     {
@@ -96,5 +97,15 @@ final class StoredJob implements StoredJobInterface
         $job->setPriority((int)$this->stats['pri'] - PheanstalkInterface::DEFAULT_PRIORITY);
 
         return $job;
+    }
+
+    /**
+     * Gets a key value list with statistics about the job.
+     *
+     * @return array
+     */
+    public function getStats(): array
+    {
+        return $this->stats;
     }
 }
