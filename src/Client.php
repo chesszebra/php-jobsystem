@@ -22,7 +22,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-final class Client
+final class Client implements ClientInterface
 {
     /**
      * The underlying job system used to as a job storage.
