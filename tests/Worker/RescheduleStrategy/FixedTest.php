@@ -12,20 +12,20 @@ namespace ChessZebra\JobSystem\Worker\RescheduleStrategy;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use PHPUnit\Framework\TestCase;
 
-final class LinearTest extends TestCase
+final class FixedTest extends TestCase
 {
     /**
      * Tests if the delay can be determined.
      *
-     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Linear::__construct
-     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Linear::determineDelay
+     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::__construct
+     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::determineDelay
      */
     public function testDetermineDelay()
     {
         // Arrange
         $job = $this->getMockForAbstractClass(StoredJobInterface::class);
 
-        $strategy = new Linear(1337, 42);
+        $strategy = new Fixed(1337, 42);
 
         // Act
         $result = $strategy->determineDelay($job);
@@ -37,15 +37,15 @@ final class LinearTest extends TestCase
     /**
      * Tests if the priority can be determined.
      *
-     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Linear::__construct
-     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Linear::determinePriority
+     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::__construct
+     * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::determinePriority
      */
     public function testDeterminePriority()
     {
         // Arrange
         $job = $this->getMockForAbstractClass(StoredJobInterface::class);
 
-        $strategy = new Linear(1337, 42);
+        $strategy = new Fixed(1337, 42);
 
         // Act
         $result = $strategy->determinePriority($job);

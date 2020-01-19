@@ -253,14 +253,19 @@ final class Client implements ClientInterface
         try {
             $this->executeJob($storedJob);
         } catch (RecoverableException $throwable) {
-            $this->rescheduleJob($storedJob, $throwable);
+            $strategy = $throwable->getRescheduleStrategy();
+
+            if ($strategy === null) {
+                $strategy = $this->getRescheduleStrategy();
+            }
+
+            $this->rescheduleJob($storedJob, $strategy, $throwable);
         } catch (Throwable $throwable) {
             $this->failJob($storedJob, $throwable);
         }
     }
 
     /**
-     * @param StoredJobInterface $storedJob
      * @throws UnknownWorkerException Thrown when the worker type is unknown.
      * @throws ContainerExceptionInterface Thrown when the worker cannot be retrieved from the service container.
      */
@@ -292,19 +297,16 @@ final class Client implements ClientInterface
         ));
     }
 
-    /**
-     * @param StoredJobInterface $storedJob
-     * @param Throwable $throwable
-     */
-    private function rescheduleJob(StoredJobInterface $storedJob, Throwable $throwable): void
-    {
+    private function rescheduleJob(
+        StoredJobInterface $storedJob,
+        ?RescheduleStrategyInterface $strategy,
+        Throwable $throwable
+    ): void {
         $this->logger->emergency(sprintf(
             '[#%d] Rescheduling job: %s',
             $storedJob->getId(),
             $throwable->getMessage()
         ));
-
-        $strategy = $this->getRescheduleStrategy();
 
         $delay = $strategy ? $strategy->determineDelay($storedJob) : null;
         $priority = $strategy ? $strategy->determinePriority($storedJob) : null;
@@ -312,10 +314,6 @@ final class Client implements ClientInterface
         $this->storage->rescheduleJob($storedJob, $delay, $priority);
     }
 
-    /**
-     * @param StoredJobInterface $storedJob
-     * @param Throwable $throwable
-     */
     private function failJob(StoredJobInterface $storedJob, Throwable $throwable): void
     {
         $this->logger->emergency(sprintf(

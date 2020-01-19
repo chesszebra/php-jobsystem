@@ -12,18 +12,14 @@ namespace ChessZebra\JobSystem\Worker\RescheduleStrategy;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
 
 /**
- * A linear value meaning the delay and priority are determined based on a static value.
+ * A fixed value meaning the delay and priority are determined based on a static value.
  */
-final class Linear implements RescheduleStrategyInterface
+final class Fixed implements RescheduleStrategyInterface
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     private $delay;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $priority;
 
     /**
