@@ -74,6 +74,13 @@ final class Client implements ClientInterface
     private $rescheduleStrategy;
 
     /**
+     * A list of callback's to invoke once an exception occurs.
+     *
+     * @var callable[]
+     */
+    private $exceptionListeners;
+
+    /**
      * Initializes a new instance of this class.
      *
      * @param StorageInterface $storage
@@ -88,6 +95,7 @@ final class Client implements ClientInterface
         $this->interval = 500;
         $this->lifetime = 3600;
         $this->maximumMemoryUsage = PHP_INT_MAX;
+        $this->exceptionListeners = [];
     }
 
     /**
@@ -185,6 +193,36 @@ final class Client implements ClientInterface
     }
 
     /**
+     * Adds the given callback method as an exception listener.
+     */
+    public function addExceptionListener(callable $listener): void
+    {
+        $this->exceptionListeners[] = $listener;
+    }
+
+    /**
+     * Removes all exception listeners.
+     */
+    public function clearExceptionListener(): void
+    {
+        $this->exceptionListeners = [];
+    }
+
+    /**
+     * Removes the given callback from the exception listeners.
+     */
+    public function removeExceptionListener(callable $listener): void
+    {
+        $index = array_search($listener, $this->exceptionListeners);
+
+        if ($index === false) {
+            return;
+        }
+
+        unset($this->exceptionListeners[$index]);
+    }
+
+    /**
      * Runs the client.
      *
      * @return int The exit code.
@@ -198,11 +236,7 @@ final class Client implements ClientInterface
             try {
                 $this->processNextJob();
             } catch (Throwable $e) {
-                $this->logger->emergency($e->getMessage(), [
-                    'throwable' => $e,
-                ]);
-
-                $exitCode = 1;
+                $exitCode = $this->handleException($e);
                 break;
             }
 
@@ -323,5 +357,18 @@ final class Client implements ClientInterface
         ));
 
         $this->storage->failJob($storedJob);
+    }
+
+    private function handleException(Throwable $exception): int
+    {
+        $this->logger->emergency($exception->getMessage(), [
+            'throwable' => $exception,
+        ]);
+
+        foreach ($this->exceptionListeners as $callback) {
+            call_user_func_array($callback, [$this, $exception]);
+        }
+
+        return 1;
     }
 }
