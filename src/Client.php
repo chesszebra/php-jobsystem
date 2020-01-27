@@ -25,18 +25,18 @@ use Throwable;
 final class Client implements ClientInterface
 {
     /**
+     * The options used configure the client.
+     *
+     * @var ClientOptions
+     */
+    private $options;
+
+    /**
      * The underlying job system used to as a job storage.
      *
      * @var StorageInterface
      */
     private $storage;
-
-    /**
-     * The logger used to write information to.
-     *
-     * @var LoggerInterface
-     */
-    private $logger;
 
     /**
      * A container with all available workers.
@@ -45,57 +45,19 @@ final class Client implements ClientInterface
      */
     private $workers;
 
-    /**
-     * The interval in microseconds between each job.
-     *
-     * @var int
-     */
-    private $interval;
+    /** @var LoggerInterface */
+    private $logger;
 
-    /**
-     * The maximum amount of seconds the client can run.
-     *
-     * @var int
-     */
-    private $lifetime;
-
-    /**
-     * The maximum memory that can be used (in bytes) before the client stops running.
-     *
-     * @var int
-     */
-    private $maximumMemoryUsage;
-
-    /**
-     * The strategy used to reschedule the job.
-     *
-     * @var null|RescheduleStrategyInterface
-     */
-    private $rescheduleStrategy;
-
-    /**
-     * A list of callback's to invoke once an exception occurs.
-     *
-     * @var callable[]
-     */
-    private $exceptionListeners;
-
-    /**
-     * Initializes a new instance of this class.
-     *
-     * @param StorageInterface $storage
-     * @param LoggerInterface $logger
-     * @param ContainerInterface $workers
-     */
-    public function __construct(StorageInterface $storage, LoggerInterface $logger, ContainerInterface $workers)
-    {
+    public function __construct(
+        ClientOptions $options,
+        StorageInterface $storage,
+        ContainerInterface $workers,
+        LoggerInterface $logger
+    ) {
+        $this->options = $options;
         $this->storage = $storage;
-        $this->logger = $logger;
         $this->workers = $workers;
-        $this->interval = 500;
-        $this->lifetime = 3600;
-        $this->maximumMemoryUsage = PHP_INT_MAX;
-        $this->exceptionListeners = [];
+        $this->logger = $logger;
     }
 
     /**
@@ -109,117 +71,11 @@ final class Client implements ClientInterface
     }
 
     /**
-     * Gets the lifetime of the client.
-     *
-     * @return int Returns the lifetime in seconds.
+     * Gets the options used to run this client.
      */
-    public function getLifetime(): int
+    public function getOptions(): ClientOptions
     {
-        return $this->lifetime;
-    }
-
-    /**
-     * Sets the lifetime (in seconds) for the client.
-     *
-     * @param int $lifetime The lifetime to set.
-     * @return void
-     */
-    public function setLifetime(int $lifetime): void
-    {
-        $this->lifetime = $lifetime;
-    }
-
-    /**
-     * Gets the maximum amount of memory that can be used by the client.
-     *
-     * @return int The amount of memory in bytes.
-     */
-    public function getMaximumMemoryUsage(): int
-    {
-        return $this->maximumMemoryUsage;
-    }
-
-    /**
-     * Sets the maximum amount of memory that can be used by the client.
-     *
-     * @param int $maximumMemoryUsage The memory in bytes to set.
-     * @return void
-     */
-    public function setMaximumMemoryUsage(int $maximumMemoryUsage): void
-    {
-        $this->maximumMemoryUsage = $maximumMemoryUsage;
-    }
-
-    /**
-     * Gets the interval in between jobs.
-     *
-     * @return int Returns the interval in seconds.
-     */
-    public function getInterval(): int
-    {
-        return $this->interval;
-    }
-
-    /**
-     * Sets the interval in between jobs.
-     *
-     * @param int $interval The interval in seconds to set.
-     * @return void
-     */
-    public function setInterval(int $interval): void
-    {
-        $this->interval = $interval;
-    }
-
-    /**
-     * Gets the rescheduling strategy.
-     *
-     * @return RescheduleStrategyInterface
-     */
-    public function getRescheduleStrategy(): ?RescheduleStrategyInterface
-    {
-        return $this->rescheduleStrategy;
-    }
-
-    /**
-     * Sets the reschedule strategy.
-     *
-     * @param null|RescheduleStrategyInterface $rescheduleStrategy The strategy to set.
-     * @return void
-     */
-    public function setRescheduleStrategy(?RescheduleStrategyInterface $rescheduleStrategy): void
-    {
-        $this->rescheduleStrategy = $rescheduleStrategy;
-    }
-
-    /**
-     * Adds the given callback method as an exception listener.
-     */
-    public function addExceptionListener(callable $listener): void
-    {
-        $this->exceptionListeners[] = $listener;
-    }
-
-    /**
-     * Removes all exception listeners.
-     */
-    public function clearExceptionListener(): void
-    {
-        $this->exceptionListeners = [];
-    }
-
-    /**
-     * Removes the given callback from the exception listeners.
-     */
-    public function removeExceptionListener(callable $listener): void
-    {
-        $index = array_search($listener, $this->exceptionListeners);
-
-        if ($index === false) {
-            return;
-        }
-
-        unset($this->exceptionListeners[$index]);
+        return $this->options;
     }
 
     /**
@@ -241,7 +97,7 @@ final class Client implements ClientInterface
             }
 
             // Allow the server to breath...
-            usleep($this->interval);
+            usleep($this->getOptions()->getInterval());
         } while ($this->shouldKeepRunning($startTime, memory_get_usage(true)));
 
         return $exitCode;
@@ -256,9 +112,9 @@ final class Client implements ClientInterface
      */
     private function shouldKeepRunning(int $startTime, int $memoryUsage): bool
     {
-        $runningTimeExpired = (time() - $startTime) >= $this->getLifetime();
+        $runningTimeExpired = (time() - $startTime) >= $this->getOptions()->getLifetime();
 
-        $memoryLimitReached = $memoryUsage >= $this->maximumMemoryUsage;
+        $memoryLimitReached = $memoryUsage >= $this->getOptions()->getMaximumMemoryUsage();
 
         return !$runningTimeExpired && !$memoryLimitReached;
     }
@@ -290,7 +146,7 @@ final class Client implements ClientInterface
             $strategy = $throwable->getRescheduleStrategy();
 
             if ($strategy === null) {
-                $strategy = $this->getRescheduleStrategy();
+                $strategy = $this->getOptions()->getRescheduleStrategy();
             }
 
             $this->rescheduleJob($storedJob, $strategy, $throwable);
@@ -364,10 +220,6 @@ final class Client implements ClientInterface
         $this->logger->emergency($exception->getMessage(), [
             'throwable' => $exception,
         ]);
-
-        foreach ($this->exceptionListeners as $callback) {
-            call_user_func_array($callback, [$this, $exception]);
-        }
 
         return 1;
     }
