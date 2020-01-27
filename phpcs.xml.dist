@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="chesszebra">
+    <description>The ChessZebra Coding Standard</description>
+
+    <!-- display progress -->
+    <arg value="p"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php,dist,phtml"/>
+    <arg name="basepath" value="./"/>
+
+    <rule ref="vendor/chesszebra/coding-standards/ChessZebra/ruleset.xml"/>
+
+    <file>src</file>
+    <file>tests</file>
+</ruleset>
