@@ -28,6 +28,7 @@ final class DelayedJobTest extends TestCase
         // Assert
         static::assertTrue($result);
     }
+
     /**
      * Tests if the isReady method returns falsse when the job is no ready yet.
      *
