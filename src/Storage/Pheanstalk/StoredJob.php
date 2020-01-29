@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * PHP Job System (https://chesszebra.com)
- *
- * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- */
-
 namespace ChessZebra\JobSystem\Storage\Pheanstalk;
 
 use ChessZebra\JobSystem\Job\Job;

@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace ChessZebra\JobSystem;
 
+use ChessZebra\JobSystem\Job\Job;
 use ChessZebra\JobSystem\Job\JobInterface;
+use ChessZebra\JobSystem\Storage\InMemoryStorage;
 use ChessZebra\JobSystem\Storage\StorageInterface;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use ChessZebra\JobSystem\Worker\Exception\RecoverableException;
@@ -110,7 +112,7 @@ final class ClientTest extends TestCase
     public function testRunWithInvalidWorker(): void
     {
         // Arrange
-        $this->logger->expects($this->once())->method('emergency');
+        $this->logger->expects($this->any())->method('emergency');
         $this->storage->expects($this->once())->method('retrieveJob')->willReturn($this->storedJob);
         $this->storage->expects($this->once())->method('failJob');
 
@@ -184,5 +186,32 @@ final class ClientTest extends TestCase
 
         // Assert
         static::assertEquals(0, $result);
+    }
+
+    /**
+     * Tests adding exception listeners
+     */
+    public function testExceptionListenerIsCalled(): void
+    {
+        // Arrange
+        $called = false;
+
+        $callback = function() use (&$called) {
+            $called = true;
+        };
+
+        $this->options->setLifetime(0);
+
+        $storage = new InMemoryStorage();
+        $storage->addJob(new Job('worker', []));
+
+        $client = new Client($this->options, $storage, $this->workers, $this->logger);
+        $client->addExceptionListener($callback);
+
+        // Act
+        $client->run();
+
+        // Assert
+        static::assertTrue($called);
     }
 }

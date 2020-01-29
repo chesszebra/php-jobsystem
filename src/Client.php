@@ -162,16 +162,20 @@ final class Client implements ClientInterface
     {
         try {
             $this->executeJob($storedJob);
-        } catch (RecoverableException $throwable) {
-            $strategy = $throwable->getRescheduleStrategy();
+        } catch (RecoverableException $exception) {
+            $this->handleException($exception);
+
+            $strategy = $exception->getRescheduleStrategy();
 
             if ($strategy === null) {
                 $strategy = $this->getOptions()->getRescheduleStrategy();
             }
 
-            $this->rescheduleJob($storedJob, $strategy, $throwable);
-        } catch (Throwable $throwable) {
-            $this->failJob($storedJob, $throwable);
+            $this->rescheduleJob($storedJob, $strategy, $exception);
+        } catch (Throwable $exception) {
+            $this->failJob($storedJob, $exception);
+
+            $this->handleException($exception);
         }
     }
 
