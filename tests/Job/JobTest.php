@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem\Job;
@@ -19,7 +20,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::__construct
      * @covers \ChessZebra\JobSystem\Job\Job::getWorkerName
      */
-    public function testIfNameIsConstructed()
+    public function testIfNameIsConstructed(): void
     {
         // Arrange
         $params = [];
@@ -37,7 +38,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::__construct
      * @covers \ChessZebra\JobSystem\Job\Job::getWorkerParams
      */
-    public function testIfParametersIsConstructedWithoutParameters()
+    public function testIfParametersIsConstructedWithoutParameters(): void
     {
         // Arrange
         $params = [];
@@ -55,12 +56,10 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::__construct
      * @covers \ChessZebra\JobSystem\Job\Job::getWorkerParams
      */
-    public function testIfParametersIsConstructedWithParameters()
+    public function testIfParametersIsConstructedWithParameters(): void
     {
         // Arrange
-        $params = [
-            'key' => 'value',
-        ];
+        $params = ['key' => 'value'];
 
         // Act
         $job = new Job('name', $params, null);
@@ -75,7 +74,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::__construct
      * @covers \ChessZebra\JobSystem\Job\Job::getQueueName
      */
-    public function testIfQueueIsConstructedWithoutName()
+    public function testIfQueueIsConstructedWithoutName(): void
     {
         // Arrange
         $params = [];
@@ -93,7 +92,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::__construct
      * @covers \ChessZebra\JobSystem\Job\Job::getQueueName
      */
-    public function testIfQueueIsConstructedWithName()
+    public function testIfQueueIsConstructedWithName(): void
     {
         // Arrange
         $params = [];
@@ -111,7 +110,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::getPriority
      * @covers \ChessZebra\JobSystem\Job\Job::setPriority
      */
-    public function testSetGetPriority()
+    public function testSetGetPriority(): void
     {
         // Arrange
         $job = new Job('name', [], null);
@@ -129,7 +128,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::getDelay
      * @covers \ChessZebra\JobSystem\Job\Job::setDelay
      */
-    public function testSetGetDelay()
+    public function testSetGetDelay(): void
     {
         // Arrange
         $job = new Job('name', [], null);
@@ -147,7 +146,7 @@ final class JobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Job\Job::getTimeToRun
      * @covers \ChessZebra\JobSystem\Job\Job::setTimeToRun
      */
-    public function testSetGetTimeToRun()
+    public function testSetGetTimeToRun(): void
     {
         // Arrange
         $job = new Job('name', [], null);

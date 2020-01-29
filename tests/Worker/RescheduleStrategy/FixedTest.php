@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem\Worker\RescheduleStrategy;
@@ -20,7 +21,7 @@ final class FixedTest extends TestCase
      * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::__construct
      * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::determineDelay
      */
-    public function testDetermineDelay()
+    public function testDetermineDelay(): void
     {
         // Arrange
         $job = $this->getMockForAbstractClass(StoredJobInterface::class);
@@ -40,7 +41,7 @@ final class FixedTest extends TestCase
      * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::__construct
      * @covers \ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed::determinePriority
      */
-    public function testDeterminePriority()
+    public function testDeterminePriority(): void
     {
         // Arrange
         $job = $this->getMockForAbstractClass(StoredJobInterface::class);

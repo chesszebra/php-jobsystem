@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem;
@@ -21,6 +22,13 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use function assert;
+use function json_encode;
+use function memory_get_usage;
+use function sprintf;
+use function time;
+use function usleep;
+use const JSON_UNESCAPED_SLASHES;
 
 final class Client implements ClientInterface
 {
@@ -62,8 +70,6 @@ final class Client implements ClientInterface
 
     /**
      * Gets the storage used by this client.
-     *
-     * @return StorageInterface
      */
     public function getStorage(): StorageInterface
     {
@@ -106,26 +112,22 @@ final class Client implements ClientInterface
     /**
      * Checks if the client should keep running.
      *
-     * @param int $startTime The unixtime of when the client started running.
+     * @param int $startTime   The unixtime of when the client started running.
      * @param int $memoryUsage The current amount of memory usage.
-     * @return bool
      */
     private function shouldKeepRunning(int $startTime, int $memoryUsage): bool
     {
-        $runningTimeExpired = (time() - $startTime) >= $this->getOptions()->getLifetime();
+        $runningTimeExpired = time() - $startTime >= $this->getOptions()->getLifetime();
 
         $memoryLimitReached = $memoryUsage >= $this->getOptions()->getMaximumMemoryUsage();
 
         return !$runningTimeExpired && !$memoryLimitReached;
     }
 
-    /**
-     * @return void
-     */
     private function processNextJob(): void
     {
-        /** @var StoredJobInterface|null $job */
         $job = $this->storage->retrieveJob();
+        assert($job instanceof StoredJobInterface || $job === null);
 
         if (!$job) {
             return;
@@ -135,9 +137,6 @@ final class Client implements ClientInterface
         $this->processJob($job);
     }
 
-    /**
-     * @param StoredJobInterface $storedJob
-     */
     private function processJob(StoredJobInterface $storedJob): void
     {
         try {
@@ -161,8 +160,8 @@ final class Client implements ClientInterface
      */
     private function executeJob(StoredJobInterface $storedJob): void
     {
-        /** @var JobInterface $job */
         $job = $storedJob->createJobRepresentation();
+        assert($job instanceof JobInterface);
 
         $this->logger->info(sprintf(
             '[#%d] Job "%s" started: %s',
@@ -175,8 +174,8 @@ final class Client implements ClientInterface
             throw new UnknownWorkerException(sprintf('The worker "%s" is not a valid worker.', $job->getWorkerName()));
         }
 
-        /** @var WorkerInterface $worker */
         $worker = $this->workers->get($job->getWorkerName());
+        assert($worker instanceof WorkerInterface);
         $worker->run(new Context($this->storage, $this->logger, $storedJob));
 
         $this->storage->deleteJob($storedJob);
@@ -217,9 +216,7 @@ final class Client implements ClientInterface
 
     private function handleException(Throwable $exception): int
     {
-        $this->logger->emergency($exception->getMessage(), [
-            'throwable' => $exception,
-        ]);
+        $this->logger->emergency($exception->getMessage(), ['throwable' => $exception]);
 
         return 1;
     }

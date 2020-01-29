@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem\Job;
@@ -14,42 +15,28 @@ namespace ChessZebra\JobSystem\Job;
  */
 final class Job implements JobInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $workerName;
 
-    /**
-     * @var array
-     */
+    /** @var mixed[] */
     private $workerParams;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $queueName;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $priority;
 
-    /**
-     * @var int|null
-     */
+    /** @var int|null */
     private $delay;
 
-    /**
-     * @var int|null
-     */
+    /** @var int|null */
     private $timeToRun;
 
     /**
      * Initializes a new instance of this class.
      *
-     * @param string $workerName The name of the worker to run.
-     * @param array $workerParams The parameters to pass to the worker.
-     * @param null|string $queueName The name of the queue to store the job in.
+     * @param mixed[] $workerParams The parameters to pass to the worker.
      */
     public function __construct(string $workerName, array $workerParams, ?string $queueName = null)
     {
@@ -61,8 +48,6 @@ final class Job implements JobInterface
 
     /**
      * Gets the name of the worker to run.
-     *
-     * @return string
      */
     public function getWorkerName(): string
     {
@@ -72,7 +57,7 @@ final class Job implements JobInterface
     /**
      * Gets an array with parameters that should be passed to the worker.
      *
-     * @return array
+     * @return mixed[]
      */
     public function getWorkerParams(): array
     {
@@ -81,8 +66,6 @@ final class Job implements JobInterface
 
     /**
      * Gets the name of the queue to store the job in.
-     *
-     * @return null|string
      */
     public function getQueueName(): ?string
     {
@@ -92,8 +75,6 @@ final class Job implements JobInterface
     /**
      * Gets the priority of the job.
      * The higher this number is, the earlier the job is executed.
-     *
-     * @return int
      */
     public function getPriority(): int
     {
@@ -112,8 +93,6 @@ final class Job implements JobInterface
 
     /**
      * Gets the delay in seconds which indicates when the job is started.
-     *
-     * @return int|null
      */
     public function getDelay(): ?int
     {
@@ -132,8 +111,6 @@ final class Job implements JobInterface
 
     /**
      * Gets the time to run in seconds which defines how long the job can run.
-     *
-     * @return int|null
      */
     public function getTimeToRun(): ?int
     {

@@ -1,10 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem;
@@ -15,18 +16,28 @@ use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use ChessZebra\JobSystem\Worker\Exception\RecoverableException;
 use ChessZebra\JobSystem\Worker\RescheduleStrategy\RescheduleStrategyInterface;
 use ChessZebra\JobSystem\Worker\WorkerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
+use const PHP_INT_MAX;
 
 final class ClientTest extends TestCase
 {
+    /** @var MockObject */
     private $storage;
+
+    /** @var MockObject */
     private $logger;
+
+    /** @var MockObject */
     private $workers;
+
+    /** @var MockObject */
     private $storedJob;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +53,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::__construct
      * @covers \ChessZebra\JobSystem\Client::getStorage
      */
-    public function testIfStorageIsConstructed()
+    public function testIfStorageIsConstructed(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -60,7 +71,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::__construct
      * @covers \ChessZebra\JobSystem\Client::getLifetime
      */
-    public function testIfLifetimeIsConstructed()
+    public function testIfLifetimeIsConstructed(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -78,7 +89,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::getLifetime
      * @covers \ChessZebra\JobSystem\Client::setLifetime
      */
-    public function testSetGetLifetime()
+    public function testSetGetLifetime(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -98,7 +109,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::__construct
      * @covers \ChessZebra\JobSystem\Client::getMaximumMemoryUsage
      */
-    public function testIfMaximumMemoryUsageIsConstructed()
+    public function testIfMaximumMemoryUsageIsConstructed(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -116,7 +127,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::getMaximumMemoryUsage
      * @covers \ChessZebra\JobSystem\Client::setMaximumMemoryUsage
      */
-    public function testSetGetMaximumMemoryUsage()
+    public function testSetGetMaximumMemoryUsage(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -136,7 +147,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::__construct
      * @covers \ChessZebra\JobSystem\Client::getInterval
      */
-    public function testIfIntervalIsConstructed()
+    public function testIfIntervalIsConstructed(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -154,7 +165,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::getInterval
      * @covers \ChessZebra\JobSystem\Client::setInterval
      */
-    public function testSetGetInterval()
+    public function testSetGetInterval(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -174,7 +185,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::__construct
      * @covers \ChessZebra\JobSystem\Client::getRescheduleStrategy
      */
-    public function testIfRescheduleStrategyIsConstructed()
+    public function testIfRescheduleStrategyIsConstructed(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -192,7 +203,7 @@ final class ClientTest extends TestCase
      * @covers \ChessZebra\JobSystem\Client::getRescheduleStrategy
      * @covers \ChessZebra\JobSystem\Client::setRescheduleStrategy
      */
-    public function testSetGetRescheduleStrategy()
+    public function testSetGetRescheduleStrategy(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -211,7 +222,7 @@ final class ClientTest extends TestCase
     /**
      * Tests running the client.
      */
-    public function testRunWithoutJobs()
+    public function testRunWithoutJobs(): void
     {
         // Arrange
         $client = new Client($this->storage, $this->logger, $this->workers);
@@ -227,11 +238,11 @@ final class ClientTest extends TestCase
     /**
      * Tests running the client.
      */
-    public function testRunWithInvalidStorage()
+    public function testRunWithInvalidStorage(): void
     {
         // Arrange
         $this->logger->expects($this->once())->method('emergency');
-        $this->storage->expects($this->once())->method('retrieveJob')->willThrowException(new \RuntimeException());
+        $this->storage->expects($this->once())->method('retrieveJob')->willThrowException(new RuntimeException());
 
         $client = new Client($this->storage, $this->logger, $this->workers);
         $client->setLifetime(0);
@@ -246,7 +257,7 @@ final class ClientTest extends TestCase
     /**
      * Tests running the client.
      */
-    public function testRunWithInvalidWorker()
+    public function testRunWithInvalidWorker(): void
     {
         // Arrange
         $this->logger->expects($this->once())->method('emergency');
@@ -266,7 +277,7 @@ final class ClientTest extends TestCase
     /**
      * Tests running the client.
      */
-    public function testRunWithValidWorker()
+    public function testRunWithValidWorker(): void
     {
         // Arrange
         $worker = $this->getMockForAbstractClass(WorkerInterface::class);
@@ -295,7 +306,7 @@ final class ClientTest extends TestCase
     /**
      * Tests running the client.
      */
-    public function testRunWithReschedule()
+    public function testRunWithReschedule(): void
     {
         // Arrange
         $worker = $this->getMockForAbstractClass(WorkerInterface::class);

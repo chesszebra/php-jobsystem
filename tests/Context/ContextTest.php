@@ -1,29 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem\Context;
 
 use ChessZebra\JobSystem\Job\Job;
 use ChessZebra\JobSystem\Job\JobInterface;
-use ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob;
 use ChessZebra\JobSystem\Storage\StorageInterface;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 final class ContextTest extends TestCase
 {
+    /** @var MockObject */
     private $storage;
+
+    /** @var MockObject */
     private $logger;
+
+    /** @var MockObject */
     private $storedJob;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +44,7 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::getLogger
      */
-    public function testGetLogger()
+    public function testGetLogger(): void
     {
         // Arrange
         $context = new Context($this->storage, $this->logger, $this->storedJob);
@@ -56,7 +62,7 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::addJob
      */
-    public function testAddJob()
+    public function testAddJob(): void
     {
         // Arrange
         $context = new Context($this->storage, $this->logger, $this->storedJob);
@@ -80,7 +86,7 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::pingJob
      */
-    public function testPingJob()
+    public function testPingJob(): void
     {
         // Arrange
         $context = new Context($this->storage, $this->logger, $this->storedJob);
@@ -102,12 +108,10 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::getParam
      */
-    public function testGetParam()
+    public function testGetParam(): void
     {
         // Arrange
-        $job = new Job('name', [
-            'existing' => 'existing-value',
-        ]);
+        $job = new Job('name', ['existing' => 'existing-value']);
 
         $this->storedJob->expects($this->once())->method('createJobRepresentation')->willReturn($job);
 
@@ -126,7 +130,7 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::getParam
      */
-    public function testGetParamDefaultValue()
+    public function testGetParamDefaultValue(): void
     {
         // Arrange
         $context = new Context($this->storage, $this->logger, $this->storedJob);
@@ -144,7 +148,7 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::getParams
      */
-    public function testGetParams()
+    public function testGetParams(): void
     {
         // Arrange
         $context = new Context($this->storage, $this->logger, $this->storedJob);
@@ -162,7 +166,7 @@ final class ContextTest extends TestCase
      * @covers \ChessZebra\JobSystem\Context\Context::__construct
      * @covers \ChessZebra\JobSystem\Context\Context::getStats
      */
-    public function testGetStats()
+    public function testGetStats(): void
     {
         // Arrange
         $context = new Context($this->storage, $this->logger, $this->storedJob);

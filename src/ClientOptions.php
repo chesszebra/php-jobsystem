@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem;
 
 use ChessZebra\JobSystem\Worker\RescheduleStrategy\RescheduleStrategyInterface;
+use const PHP_INT_MAX;
 
 final class ClientOptions
 {
@@ -62,7 +64,6 @@ final class ClientOptions
      * Sets the lifetime (in seconds) for the client.
      *
      * @param int $lifetime The lifetime to set.
-     * @return void
      */
     public function setLifetime(int $lifetime): void
     {
@@ -83,7 +84,6 @@ final class ClientOptions
      * Sets the maximum amount of memory that can be used by the client.
      *
      * @param int $maximumMemoryUsage The memory in bytes to set.
-     * @return void
      */
     public function setMaximumMemoryUsage(int $maximumMemoryUsage): void
     {
@@ -104,7 +104,6 @@ final class ClientOptions
      * Sets the interval in between jobs.
      *
      * @param int $interval The interval in seconds to set.
-     * @return void
      */
     public function setInterval(int $interval): void
     {
@@ -113,8 +112,6 @@ final class ClientOptions
 
     /**
      * Gets the rescheduling strategy.
-     *
-     * @return RescheduleStrategyInterface|null
      */
     public function getRescheduleStrategy(): ?RescheduleStrategyInterface
     {
@@ -125,7 +122,6 @@ final class ClientOptions
      * Sets the reschedule strategy.
      *
      * @param RescheduleStrategyInterface|null $rescheduleStrategy The strategy to set.
-     * @return void
      */
     public function setRescheduleStrategy(?RescheduleStrategyInterface $rescheduleStrategy): void
     {

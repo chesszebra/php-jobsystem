@@ -1,20 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem\Storage;
 
+use ArrayObject;
 use ChessZebra\JobSystem\Job\Job;
 use ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob;
 use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\PheanstalkInterface;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
+use function json_encode;
 
 final class PheanstalkTest extends TestCase
 {
@@ -28,7 +31,7 @@ final class PheanstalkTest extends TestCase
     /**
      * Called before each test.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +44,7 @@ final class PheanstalkTest extends TestCase
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::__construct
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::getReserveTimeout
      */
-    public function testIfReserveTimeoutIsConstructed()
+    public function testIfReserveTimeoutIsConstructed(): void
     {
         // Arrange
         // ...
@@ -59,7 +62,7 @@ final class PheanstalkTest extends TestCase
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::getReserveTimeout
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::setReserveTimeout
      */
-    public function testSetGetReserveTimeout()
+    public function testSetGetReserveTimeout(): void
     {
         // Arrange
         $storage = new Pheanstalk($this->connection);
@@ -76,7 +79,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::addJob
      */
-    public function testAddJobWithNullQueue()
+    public function testAddJobWithNullQueue(): void
     {
         // Arrange
         $this->connection->expects($this->once())->method('putInTube')->with(
@@ -99,7 +102,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::addJob
      */
-    public function testAddJobWithQueueName()
+    public function testAddJobWithQueueName(): void
     {
         // Arrange
         $this->connection->expects($this->once())->method('putInTube')->with(
@@ -122,7 +125,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::deleteJob
      */
-    public function testDeleteJob()
+    public function testDeleteJob(): void
     {
         // Arrange
         $job = new PheanstalkJob(123, '');
@@ -147,7 +150,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::failJob
      */
-    public function testFailJob()
+    public function testFailJob(): void
     {
         // Arrange
         $job = new PheanstalkJob(123, '');
@@ -172,7 +175,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::rescheduleJob
      */
-    public function testRescheduleJob()
+    public function testRescheduleJob(): void
     {
         // Arrange
         $job = new PheanstalkJob(123, json_encode([
@@ -205,7 +208,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::retrieveJob
      */
-    public function testRetrieveJobWithoutJobPresent()
+    public function testRetrieveJobWithoutJobPresent(): void
     {
         // Arrange
         $this->connection->expects($this->once())->method('reserve')->with(
@@ -228,7 +231,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::retrieveJob
      */
-    public function testRetrieveJobWithJobPresent()
+    public function testRetrieveJobWithJobPresent(): void
     {
         // Arrange
         $job = new PheanstalkJob(123, '');
@@ -239,9 +242,7 @@ final class PheanstalkTest extends TestCase
 
         $this->connection->expects($this->once())->method('statsJob')->with(
             $this->equalTo($job)
-        )->willReturn(new \ArrayObject([
-            'ttr' => 0,
-        ]));
+        )->willReturn(new ArrayObject(['ttr' => 0]));
 
         $storage = new Pheanstalk($this->connection);
 
@@ -257,7 +258,7 @@ final class PheanstalkTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk::pingJob
      */
-    public function testPingJob()
+    public function testPingJob(): void
     {
         // Arrange
         $job = new PheanstalkJob(123, '');

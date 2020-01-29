@@ -1,18 +1,21 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /**
  * PHP Job System (https://chesszebra.com)
  *
  * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- * @copyright Copyright (c) 2017 Chess Zebra (https://chesszebra.com)
- * @license https://github.com/chesszebra/php-jobsystem/blob/master/LICENSE.md MIT
  */
 
 namespace ChessZebra\JobSystem\Storage\Pheanstalk;
 
 use ChessZebra\JobSystem\Job\JobInterface;
+use Pheanstalk\Job;
 use Pheanstalk\PheanstalkInterface;
 use PHP_CodeSniffer\Exceptions\RuntimeException;
 use PHPUnit\Framework\TestCase;
+use function json_encode;
 
 final class StoredJobTest extends TestCase
 {
@@ -22,10 +25,10 @@ final class StoredJobTest extends TestCase
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::__construct
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::getJob
      */
-    public function testGetJob()
+    public function testGetJob(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, '');
+        $pheanstalkJob = new Job(1337, '');
         $job = new StoredJob($pheanstalkJob, []);
 
         // Act
@@ -40,10 +43,10 @@ final class StoredJobTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::getId
      */
-    public function testGetId()
+    public function testGetId(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, '');
+        $pheanstalkJob = new Job(1337, '');
         $job = new StoredJob($pheanstalkJob, []);
 
         // Act
@@ -58,10 +61,10 @@ final class StoredJobTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::createJobRepresentation
      */
-    public function testCreateJobRepresentation()
+    public function testCreateJobRepresentation(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, json_encode([
+        $pheanstalkJob = new Job(1337, json_encode([
             'type' => 'awesome',
             'data' => [],
         ]));
@@ -86,10 +89,10 @@ final class StoredJobTest extends TestCase
      * @expectedException RuntimeException
      * @expectedExceptionMessage Invalid JSON, got ""
      */
-    public function testCreateJobRepresentationWithoutData()
+    public function testCreateJobRepresentationWithoutData(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, '');
+        $pheanstalkJob = new Job(1337, '');
         $job = new StoredJob($pheanstalkJob, [
             'tube' => 'default',
             'delay' => PheanstalkInterface::DEFAULT_DELAY,
@@ -111,10 +114,10 @@ final class StoredJobTest extends TestCase
      * @expectedException RuntimeException
      * @expectedExceptionMessage Missing "type" field in "{"test": "test"}"
      */
-    public function testCreateJobRepresentationWithoutTypeMember()
+    public function testCreateJobRepresentationWithoutTypeMember(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, '{"test": "test"}');
+        $pheanstalkJob = new Job(1337, '{"test": "test"}');
         $job = new StoredJob($pheanstalkJob, [
             'tube' => 'default',
             'delay' => PheanstalkInterface::DEFAULT_DELAY,
@@ -136,10 +139,10 @@ final class StoredJobTest extends TestCase
      * @expectedException RuntimeException
      * @expectedExceptionMessage Missing "data" field in "{"type": "test"}"
      */
-    public function testCreateJobRepresentationWithoutDataMember()
+    public function testCreateJobRepresentationWithoutDataMember(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, '{"type": "test"}');
+        $pheanstalkJob = new Job(1337, '{"type": "test"}');
         $job = new StoredJob($pheanstalkJob, [
             'tube' => 'default',
             'delay' => PheanstalkInterface::DEFAULT_DELAY,
@@ -159,10 +162,10 @@ final class StoredJobTest extends TestCase
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::getStats
      */
-    public function testGetStats()
+    public function testGetStats(): void
     {
         // Arrange
-        $pheanstalkJob = new \Pheanstalk\Job(1337, json_encode([
+        $pheanstalkJob = new Job(1337, json_encode([
             'type' => 'awesome',
             'data' => [],
         ]));
