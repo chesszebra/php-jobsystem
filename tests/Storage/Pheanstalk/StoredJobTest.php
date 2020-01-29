@@ -13,8 +13,8 @@ namespace ChessZebra\JobSystem\Storage\Pheanstalk;
 use ChessZebra\JobSystem\Job\JobInterface;
 use Pheanstalk\Job;
 use Pheanstalk\PheanstalkInterface;
-use PHP_CodeSniffer\Exceptions\RuntimeException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use function json_encode;
 
 final class StoredJobTest extends TestCase
@@ -86,11 +86,13 @@ final class StoredJobTest extends TestCase
      * Tests if the job contains valid json.
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::createJobRepresentation
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Invalid JSON, got ""
      */
     public function testCreateJobRepresentationWithoutData(): void
     {
+        // Assert
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid JSON, got ""');
+
         // Arrange
         $pheanstalkJob = new Job(1337, '');
         $job = new StoredJob($pheanstalkJob, [
@@ -101,21 +103,20 @@ final class StoredJobTest extends TestCase
         ]);
 
         // Act
-        $result = $job->createJobRepresentation();
-
-        // Assert
-        static::assertInstanceOf(JobInterface::class, $result);
+        $job->createJobRepresentation();
     }
 
     /**
      * Tests if the type member is present in the json data.
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::createJobRepresentation
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Missing "type" field in "{"test": "test"}"
      */
     public function testCreateJobRepresentationWithoutTypeMember(): void
     {
+        // Assert
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Missing "type" field in "{"test": "test"}"');
+
         // Arrange
         $pheanstalkJob = new Job(1337, '{"test": "test"}');
         $job = new StoredJob($pheanstalkJob, [
@@ -126,21 +127,20 @@ final class StoredJobTest extends TestCase
         ]);
 
         // Act
-        $result = $job->createJobRepresentation();
-
-        // Assert
-        static::assertInstanceOf(JobInterface::class, $result);
+        $job->createJobRepresentation();
     }
 
     /**
      * Tests if the data member is present in the json data.
      *
      * @covers \ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob::createJobRepresentation
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Missing "data" field in "{"type": "test"}"
      */
     public function testCreateJobRepresentationWithoutDataMember(): void
     {
+        // Assert
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Missing "data" field in "{"type": "test"}"');
+
         // Arrange
         $pheanstalkJob = new Job(1337, '{"type": "test"}');
         $job = new StoredJob($pheanstalkJob, [
@@ -151,10 +151,7 @@ final class StoredJobTest extends TestCase
         ]);
 
         // Act
-        $result = $job->createJobRepresentation();
-
-        // Assert
-        static::assertInstanceOf(JobInterface::class, $result);
+        $job->createJobRepresentation();
     }
 
     /**
