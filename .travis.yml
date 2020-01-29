@@ -17,5 +17,5 @@ before_script:
   - travis_retry composer install
 
 script:
-  - vendor/bin/phpcs --standard=vendor/chesszebra/coding-standards/ChessZebra/ruleset.xml
-  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - vendor/bin/phpcs
+  - vendor/bin/phpunit
