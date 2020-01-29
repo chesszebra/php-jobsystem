@@ -31,6 +31,9 @@ final class StoredJob implements StoredJobInterface
         return $this->job;
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getStats(): array
     {
         return [];

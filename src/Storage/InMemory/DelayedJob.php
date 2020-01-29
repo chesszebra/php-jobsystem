@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ChessZebra\JobSystem\Storage\InMemory;
 
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
+use function time;
 
 final class DelayedJob
 {

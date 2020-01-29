@@ -8,6 +8,7 @@ use ChessZebra\JobSystem\Job\JobInterface;
 use ChessZebra\JobSystem\Storage\InMemory\DelayedJob;
 use ChessZebra\JobSystem\Storage\InMemory\StoredJob;
 use SplQueue;
+use function assert;
 
 /**
  * A storage adapter which keeps all jobs in memory.
@@ -44,6 +45,7 @@ final class InMemoryStorage implements StorageInterface
         foreach ($this->readyJobs as $index => $job) {
             if ($job === $storedJob) {
                 unset($this->readyJobs[$index]);
+
                 return;
             }
         }
@@ -51,6 +53,7 @@ final class InMemoryStorage implements StorageInterface
         foreach ($this->failedJobs as $index => $job) {
             if ($job === $storedJob) {
                 unset($this->failedJobs[$index]);
+
                 return;
             }
         }
@@ -58,6 +61,7 @@ final class InMemoryStorage implements StorageInterface
         foreach ($this->delayedJobs as $index => $job) {
             if ($job === $storedJob) {
                 unset($this->delayedJobs[$index]);
+
                 return;
             }
         }
@@ -76,8 +80,8 @@ final class InMemoryStorage implements StorageInterface
     public function retrieveJob(): ?StoredJobInterface
     {
         if (!$this->delayedJobs->isEmpty() && $this->delayedJobs[0]->isReady()) {
-            /** @var DelayedJob $job */
             $job = $this->delayedJobs->dequeue();
+            assert($job instanceof DelayedJob);
 
             return $job->getStoredJob();
         }

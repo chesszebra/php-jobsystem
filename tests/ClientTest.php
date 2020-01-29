@@ -196,7 +196,7 @@ final class ClientTest extends TestCase
         // Arrange
         $called = false;
 
-        $callback = function() use (&$called) {
+        $callback = static function () use (&$called): void {
             $called = true;
         };
 
