@@ -29,16 +29,25 @@ final class DelayedJob
         $this->priority = $priority;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getStoredJob(): StoredJobInterface
     {
         return $this->storedJob;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getDelay(): ?int
     {
         return $this->delay;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getPriority(): ?int
     {
         return $this->priority;
@@ -52,6 +61,6 @@ final class DelayedJob
             $nextTime += $this->delay;
         }
 
-        return $nextTime < time();
+        return $nextTime <= time();
     }
 }
