@@ -15,6 +15,11 @@ use ChessZebra\JobSystem\Storage\StorageInterface;
 interface ClientInterface // phpcs:ignore
 {
     /**
+     * Adds an listener which should be called when an exception occurs.
+     */
+    public function addExceptionListener(callable $callback): void;
+
+    /**
      * Gets the storage used by this client.
      */
     public function getStorage(): StorageInterface;

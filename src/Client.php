@@ -23,6 +23,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use function assert;
+use function call_user_func;
 use function json_encode;
 use function memory_get_usage;
 use function sprintf;
@@ -53,8 +54,19 @@ final class Client implements ClientInterface
      */
     private $workers;
 
-    /** @var LoggerInterface */
+    /**
+     * The logger used to display progress.
+     *
+     * @var LoggerInterface
+     */
     private $logger;
+
+    /**
+     * A list of listeners that are called when an exception does occur.
+     *
+     * @var callable[]
+     */
+    private $exceptionListeners;
 
     public function __construct(
         ClientOptions $options,
@@ -66,6 +78,15 @@ final class Client implements ClientInterface
         $this->storage = $storage;
         $this->workers = $workers;
         $this->logger = $logger;
+        $this->exceptionListeners = [];
+    }
+
+    /**
+     * Adds an listener which should be called when an exception occurs.
+     */
+    public function addExceptionListener(callable $callback): void
+    {
+        $this->exceptionListeners[] = $callback;
     }
 
     /**
@@ -217,6 +238,10 @@ final class Client implements ClientInterface
     private function handleException(Throwable $exception): int
     {
         $this->logger->emergency($exception->getMessage(), ['throwable' => $exception]);
+
+        foreach ($this->exceptionListeners as $listener) {
+            call_user_func($listener, $this, $exception);
+        }
 
         return 1;
     }
