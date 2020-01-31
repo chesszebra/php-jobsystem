@@ -19,6 +19,16 @@ use Psr\Log\LoggerInterface;
 interface ContextInterface // phpcs:ignore
 {
     /**
+     * Gets the time in microseconds to wait before the next job can be executed.
+     */
+    public function getNextInterval(): int;
+
+    /**
+     * Sets the time in microseconds to wait before the next job can be executed.
+     */
+    public function setNextInterval(int $nextInterval): void;
+
+    /**
      * Gets the logger which can be used to write to the output stream.
      */
     public function getLogger(): LoggerInterface;

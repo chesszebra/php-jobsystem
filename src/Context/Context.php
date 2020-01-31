@@ -57,6 +57,11 @@ final class Context implements ContextInterface
     private $stats;
 
     /**
+     * @var int
+     */
+    private $nextInterval;
+
+    /**
      * Initializes a new instance of this class.
      */
     public function __construct(StorageInterface $storage, LoggerInterface $logger, StoredJobInterface $storedJob)
@@ -66,6 +71,23 @@ final class Context implements ContextInterface
         $this->storedJob = $storedJob;
         $this->params = $storedJob->createJobRepresentation()->getWorkerParams();
         $this->stats = $storedJob->getStats();
+        $this->nextInterval = 1;
+    }
+
+    /**
+     * Gets the time in microseconds to wait before the next job can be executed.
+     */
+    public function getNextInterval(): int
+    {
+        return $this->nextInterval;
+    }
+
+    /**
+     * Sets the time in microseconds to wait before the next job can be executed.
+     */
+    public function setNextInterval(int $nextInterval): void
+    {
+        $this->nextInterval = $nextInterval;
     }
 
     /**

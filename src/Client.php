@@ -117,14 +117,18 @@ final class Client implements ClientInterface
 
         do {
             try {
-                $this->processNextJob();
+                $nextInterval = $this->processNextJob();
             } catch (Throwable $e) {
                 $exitCode = $this->handleException($e);
                 break;
             }
 
+            if ($nextInterval === null) {
+                $nextInterval = $this->getOptions()->getInterval();
+            }
+
             // Allow the server to breath...
-            usleep($this->getOptions()->getInterval());
+            usleep($nextInterval);
         } while ($this->shouldKeepRunning($startTime, memory_get_usage(true)));
 
         return $exitCode;
@@ -145,23 +149,25 @@ final class Client implements ClientInterface
         return !$runningTimeExpired && !$memoryLimitReached;
     }
 
-    private function processNextJob(): void
+    private function processNextJob(): ?int
     {
         $job = $this->storage->retrieveJob();
         assert($job instanceof StoredJobInterface || $job === null);
 
         if (!$job) {
-            return;
+            return null;
         }
 
         // @todo Replace this with PSR-14 so we can move the logging into an event listener.
-        $this->processJob($job);
+        return $this->processJob($job);
     }
 
-    private function processJob(StoredJobInterface $storedJob): void
+    private function processJob(StoredJobInterface $storedJob): ?int
     {
+        $nextInterval = null;
+
         try {
-            $this->executeJob($storedJob);
+            $nextInterval = $this->executeJob($storedJob);
         } catch (RecoverableException $exception) {
             $this->handleException($exception);
 
@@ -177,13 +183,15 @@ final class Client implements ClientInterface
 
             $this->handleException($exception);
         }
+
+        return $nextInterval;
     }
 
     /**
      * @throws UnknownWorkerException Thrown when the worker type is unknown.
      * @throws ContainerExceptionInterface Thrown when the worker cannot be retrieved from the service container.
      */
-    private function executeJob(StoredJobInterface $storedJob): void
+    private function executeJob(StoredJobInterface $storedJob): int
     {
         $job = $storedJob->createJobRepresentation();
         assert($job instanceof JobInterface);
@@ -201,7 +209,11 @@ final class Client implements ClientInterface
 
         $worker = $this->workers->get($job->getWorkerName());
         assert($worker instanceof WorkerInterface);
-        $worker->run(new Context($this->storage, $this->logger, $storedJob));
+
+        $context = new Context($this->storage, $this->logger, $storedJob);
+        $context->setNextInterval($this->getOptions()->getInterval());
+
+        $worker->run($context);
 
         $this->storage->deleteJob($storedJob);
 
@@ -209,6 +221,8 @@ final class Client implements ClientInterface
             '[#%d] Finished and successfully deleted job',
             $storedJob->getId()
         ));
+
+        return $context->getNextInterval();
     }
 
     private function rescheduleJob(
