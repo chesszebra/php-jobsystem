@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace ChessZebra\JobSystem\Storage;
 
+use ArrayObject;
 use ChessZebra\JobSystem\Job\JobInterface;
 use ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob;
+use Pheanstalk\Contract\PheanstalkInterface;
 use Pheanstalk\Job;
-use Pheanstalk\PheanstalkInterface;
 use function assert;
 use function json_encode;
 use function microtime;
@@ -73,7 +74,12 @@ final class Pheanstalk implements StorageInterface
         $delay = $job->getDelay() ?: PheanstalkInterface::DEFAULT_DELAY;
         $ttr = $job->getTimeToRun() ?: PheanstalkInterface::DEFAULT_TTR;
 
-        $this->connection->putInTube($tube, $data, $priority, $delay, $ttr);
+        $tubeBackup = $this->connection->listTubeUsed();
+
+        $this->connection->useTube($tube);
+        $this->connection->put($data, $priority, $delay, $ttr);
+
+        $this->connection->useTube($tubeBackup);
     }
 
     /**
@@ -124,14 +130,16 @@ final class Pheanstalk implements StorageInterface
      */
     public function retrieveJob(): ?StoredJobInterface
     {
-        $job = $this->connection->reserve($this->getReserveTimeout());
+        $job = $this->connection->reserve();
         assert($job instanceof Job || $job === null);
 
-        if (!$job) {
+        if ($job === null) {
             return null;
         }
 
-        $stats = $this->connection->statsJob($job)->getArrayCopy();
+        $statsResponse = $this->connection->statsJob($job);
+
+        $stats = (new ArrayObject($statsResponse))->getArrayCopy();
 
         return new StoredJob($job, $stats);
     }

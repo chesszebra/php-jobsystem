@@ -11,8 +11,8 @@ declare(strict_types=1);
 namespace ChessZebra\JobSystem\Storage\Pheanstalk;
 
 use ChessZebra\JobSystem\Job\JobInterface;
+use Pheanstalk\Contract\PheanstalkInterface;
 use Pheanstalk\Job;
-use Pheanstalk\PheanstalkInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function json_encode;

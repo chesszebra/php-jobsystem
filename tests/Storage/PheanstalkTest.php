@@ -13,10 +13,11 @@ namespace ChessZebra\JobSystem\Storage;
 use ArrayObject;
 use ChessZebra\JobSystem\Job\Job;
 use ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob;
+use Pheanstalk\Contract\PheanstalkInterface;
+use Pheanstalk\Contract\ResponseInterface;
 use Pheanstalk\Job as PheanstalkJob;
-use Pheanstalk\PheanstalkInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use function json_encode;
 
 final class PheanstalkTest extends TestCase
@@ -24,7 +25,7 @@ final class PheanstalkTest extends TestCase
     /**
      * The connection used to create tests.
      *
-     * @var PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject|PheanstalkInterface
      */
     private $connection;
 
@@ -82,8 +83,9 @@ final class PheanstalkTest extends TestCase
     public function testAddJobWithNullQueue(): void
     {
         // Arrange
-        $this->connection->expects($this->once())->method('putInTube')->with(
-            $this->equalTo('default')
+        $this->connection->expects(static::exactly(2))->method('useTube')->withConsecutive(
+            [static::equalTo('default')],
+            [static::equalTo('')]
         );
 
         $storage = new Pheanstalk($this->connection);
@@ -105,8 +107,9 @@ final class PheanstalkTest extends TestCase
     public function testAddJobWithQueueName(): void
     {
         // Arrange
-        $this->connection->expects($this->once())->method('putInTube')->with(
-            $this->equalTo('awesome')
+        $this->connection->expects(static::exactly(2))->method('useTube')->withConsecutive(
+            [static::equalTo('awesome')],
+            [static::equalTo('')]
         );
 
         $storage = new Pheanstalk($this->connection);
@@ -130,8 +133,8 @@ final class PheanstalkTest extends TestCase
         // Arrange
         $job = new PheanstalkJob(123, '');
 
-        $this->connection->expects($this->once())->method('delete')->with(
-            $this->equalTo($job)
+        $this->connection->expects(static::once())->method('delete')->with(
+            static::equalTo($job)
         );
 
         $storage = new Pheanstalk($this->connection);
@@ -155,8 +158,8 @@ final class PheanstalkTest extends TestCase
         // Arrange
         $job = new PheanstalkJob(123, '');
 
-        $this->connection->expects($this->once())->method('bury')->with(
-            $this->equalTo($job)
+        $this->connection->expects(static::once())->method('bury')->with(
+            static::equalTo($job)
         );
 
         $storage = new Pheanstalk($this->connection);
@@ -183,8 +186,8 @@ final class PheanstalkTest extends TestCase
             'data' => [],
         ]));
 
-        $this->connection->expects($this->once())->method('release')->with(
-            $this->equalTo($job)
+        $this->connection->expects(static::once())->method('release')->with(
+            static::equalTo($job)
         );
 
         $storage = new Pheanstalk($this->connection);
@@ -211,11 +214,8 @@ final class PheanstalkTest extends TestCase
     public function testRetrieveJobWithoutJobPresent(): void
     {
         // Arrange
-        $this->connection->expects($this->once())->method('reserve')->with(
-            $this->equalTo(1)
-        );
-
-        $this->connection->expects($this->never())->method('statsJob');
+        $this->connection->expects(static::once())->method('reserve');
+        $this->connection->expects(static::never())->method('statsJob');
 
         $storage = new Pheanstalk($this->connection);
 
@@ -236,13 +236,13 @@ final class PheanstalkTest extends TestCase
         // Arrange
         $job = new PheanstalkJob(123, '');
 
-        $this->connection->expects($this->once())->method('reserve')->with(
-            $this->equalTo(1)
-        )->willReturn($job);
+        $this->connection->expects(static::once())->method('reserve')->willReturn($job);
 
-        $this->connection->expects($this->once())->method('statsJob')->with(
-            $this->equalTo($job)
-        )->willReturn(new ArrayObject(['ttr' => 0]));
+        $statsResponse = $this->getMockForAbstractClass(ResponseInterface::class);
+
+        $this->connection->expects(static::once())->method('statsJob')->with(
+            static::equalTo($job)
+        )->willReturn($statsResponse);
 
         $storage = new Pheanstalk($this->connection);
 
@@ -264,9 +264,9 @@ final class PheanstalkTest extends TestCase
         $job = new PheanstalkJob(123, '');
         $storedJob = new StoredJob($job, []);
 
-        $this->connection->expects($this->once())->method('touch')->with(
-            $this->equalTo($job)
-        )->willReturn($job);
+        $this->connection->expects(static::once())->method('touch')->with(
+            static::equalTo($job)
+        );
 
         $storage = new Pheanstalk($this->connection);
 
