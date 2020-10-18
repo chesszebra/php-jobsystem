@@ -2,12 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * PHP Job System (https://chesszebra.com)
- *
- * @link https://github.com/chesszebra/php-jobsystem for the canonical source repository
- */
-
 namespace ChessZebra\JobSystem;
 
 use ChessZebra\JobSystem\Context\Context;
@@ -16,8 +10,10 @@ use ChessZebra\JobSystem\Storage\StorageInterface;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use ChessZebra\JobSystem\Worker\Exception\RecoverableException;
 use ChessZebra\JobSystem\Worker\Exception\UnknownWorkerException;
+use ChessZebra\JobSystem\Worker\RescheduleStrategy\Fixed;
 use ChessZebra\JobSystem\Worker\RescheduleStrategy\RescheduleStrategyInterface;
 use ChessZebra\JobSystem\Worker\WorkerInterface;
+use Doctrine\DBAL\DBALException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -168,6 +164,13 @@ final class Client implements ClientInterface
 
         try {
             $nextInterval = $this->executeJob($storedJob);
+        } catch (DBALException $exception) {
+            $this->handleException($exception);
+
+            $stats = $storedJob->getStats();
+            $strategy = new Fixed(5, (int)$stats['pri']);
+
+            $this->rescheduleJob($storedJob, $strategy, $exception);
         } catch (RecoverableException $exception) {
             $this->handleException($exception);
 
