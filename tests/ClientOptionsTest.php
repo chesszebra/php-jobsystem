@@ -12,7 +12,9 @@ namespace ChessZebra\JobSystem;
 
 use ChessZebra\JobSystem\Worker\RescheduleStrategy\RescheduleStrategyInterface;
 use PHPUnit\Framework\TestCase;
+
 use function assert;
+
 use const PHP_INT_MAX;
 
 final class ClientOptionsTest extends TestCase

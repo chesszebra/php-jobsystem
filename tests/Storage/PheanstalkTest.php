@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace ChessZebra\JobSystem\Storage;
 
-use ArrayObject;
 use ChessZebra\JobSystem\Job\Job;
 use ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob;
 use Pheanstalk\Contract\PheanstalkInterface;
@@ -18,6 +17,7 @@ use Pheanstalk\Contract\ResponseInterface;
 use Pheanstalk\Job as PheanstalkJob;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
 use function json_encode;
 
 final class PheanstalkTest extends TestCase

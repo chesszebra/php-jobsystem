@@ -10,6 +10,7 @@ use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use Pheanstalk\Contract\PheanstalkInterface;
 use Pheanstalk\Job as PheanstalkJob;
 use RuntimeException;
+
 use function array_key_exists;
 use function json_decode;
 use function sprintf;

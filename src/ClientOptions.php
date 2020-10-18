@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace ChessZebra\JobSystem;
 
 use ChessZebra\JobSystem\Worker\RescheduleStrategy\RescheduleStrategyInterface;
+
 use const PHP_INT_MAX;
 
 final class ClientOptions

@@ -14,6 +14,7 @@ use ChessZebra\JobSystem\Job\JobInterface;
 use ChessZebra\JobSystem\Storage\StorageInterface;
 use ChessZebra\JobSystem\Storage\StoredJobInterface;
 use Psr\Log\LoggerInterface;
+
 use function array_key_exists;
 
 /**
@@ -56,9 +57,7 @@ final class Context implements ContextInterface
      */
     private $stats;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $nextInterval;
 
     /**

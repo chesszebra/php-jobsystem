@@ -15,6 +15,7 @@ use Pheanstalk\Contract\PheanstalkInterface;
 use Pheanstalk\Job;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+
 use function json_encode;
 
 final class StoredJobTest extends TestCase

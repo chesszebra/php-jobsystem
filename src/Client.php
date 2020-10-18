@@ -18,6 +18,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
+
 use function assert;
 use function call_user_func;
 use function json_encode;
@@ -25,6 +26,7 @@ use function memory_get_usage;
 use function sprintf;
 use function time;
 use function usleep;
+
 use const JSON_UNESCAPED_SLASHES;
 
 final class Client implements ClientInterface

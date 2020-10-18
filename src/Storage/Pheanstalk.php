@@ -9,6 +9,7 @@ use ChessZebra\JobSystem\Job\JobInterface;
 use ChessZebra\JobSystem\Storage\Pheanstalk\StoredJob;
 use Pheanstalk\Contract\PheanstalkInterface;
 use Pheanstalk\Job;
+
 use function assert;
 use function json_encode;
 use function microtime;
